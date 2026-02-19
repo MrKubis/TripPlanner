@@ -48,14 +48,18 @@ public class LinkService
     public async Task<UpdateResult> UpdateForTrip(string tripId, string id, PatchLinkDto dto)
     {
         var filter = Builders<Trip>.Filter.Eq(x => x.Id, tripId) &
-                     Builders<Trip>.Filter.Eq("links._id",id);
-        var update = Builders<Trip>.Update
-            .Set("links.$.url", dto.Url);
-
+                     Builders<Trip>.Filter.ElemMatch(x=>x.Links, link => link.Id == id);
+        var updateDef = new List<UpdateDefinition<Trip>>();
+        if (dto.Url != null)
+        {
+            updateDef.Add(Builders<Trip>.Update.Set("links.$.url", dto.Url));
+        }
         if (dto.Title != null)
         {
-            update.Set("links.$.title", dto.Title);
+            updateDef.Add(Builders<Trip>.Update.Set("links.$.title", dto.Title));
         }
+
+        var update = Builders<Trip>.Update.Combine(updateDef);
         var result = await _trips.UpdateOneAsync(filter,update);
         return result;
     }

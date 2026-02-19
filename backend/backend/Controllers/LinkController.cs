@@ -34,6 +34,6 @@ public class LinkController : BaseApiController
     public async Task<IActionResult> UpdateForTrip(string tripId, string id, [FromBody] PatchLinkDto dto)
     {
         var result = await _service.UpdateForTrip(tripId, id, dto);
-        return Ok();
+        return Ok(result);
     }
 }
