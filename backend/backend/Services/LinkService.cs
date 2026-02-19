@@ -1,6 +1,7 @@
 using backend.Domain.Entities;
 using backend.Dtos;
 using backend.Exceptions.Exceptions;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace backend.Services;
@@ -41,6 +42,21 @@ public class LinkService
             .PullFilter(trip => trip.Links, link => link.Id == id);
 
         var result = await _trips.UpdateOneAsync(filter, pullUpdate);
+        return result;
+    }
+
+    public async Task<UpdateResult> UpdateForTrip(string tripId, string id, PatchLinkDto dto)
+    {
+        var filter = Builders<Trip>.Filter.Eq(x => x.Id, tripId) &
+                     Builders<Trip>.Filter.Eq("links._id",id);
+        var update = Builders<Trip>.Update
+            .Set("links.$.url", dto.Url);
+
+        if (dto.Title != null)
+        {
+            update.Set("links.$.title", dto.Title);
+        }
+        var result = await _trips.UpdateOneAsync(filter,update);
         return result;
     }
 }

@@ -9,6 +9,12 @@ public class LinkDto
 
 public class CreateLinkDto
 {
-    public string Url { get; set; }
-    public string Title { get; set; }
+    public required string Url { get; set; }
+    public string? Title { get; set; }
+}
+
+public class PatchLinkDto
+{
+    public string? Url { get; set; }
+    public string? Title { get; set; }
 }

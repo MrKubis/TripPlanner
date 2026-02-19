@@ -54,4 +54,5 @@ public class TripService
         var filter = Builders<Trip>.Filter.Eq(x => x.Id, id);
         await _trips.DeleteOneAsync(filter);
     }
+    
 }
