@@ -15,9 +15,16 @@ public class TripService
         _trips = trips;
     }
     
-    public async Task<IEnumerable<Trip>> GetAllAsync()
+    public async Task<IEnumerable<TripDto>> GetAllAsync()
     {
-        return await _trips.Find(_ => true).ToListAsync();
+        var trips = await _trips.Find(_ => true).ToListAsync();
+        return trips.Select(trip => new TripDto
+        {
+            Id = trip.Id,
+            CreatedBy = trip.CreatedBy,
+            CreatedOn = trip.CreatedOn,
+            Title = trip.Title,
+        }).ToList();
     }
 
     public async Task<Trip> GetByIdAsync(string id)
