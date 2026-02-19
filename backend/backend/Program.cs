@@ -22,6 +22,7 @@ builder.Services.AddSingleton(sp =>
 });
 
 builder.Services.AddScoped<TripService>();
+builder.Services.AddScoped<LinkService>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
