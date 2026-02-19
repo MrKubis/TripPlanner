@@ -17,16 +17,15 @@ public class LinkController : BaseApiController
 
     [HttpPost("/trip/{tripId}")]
     public async Task<IActionResult> CreateForTrip(string tripId, [FromBody] CreateLinkDto dto)
-    {
-        var result = await _service.CreateForTrip(tripId, dto);
+    { 
+        await _service.CreateForTrip(tripId, dto);
         return Created();
     }
 
     [HttpDelete("/trip/{tripId}/link/{id}")]
     public async Task<IActionResult> DeleteForTrip(string tripId,string id)
     {
-        var result = await _service.DeleteForTrip(tripId, id);
-        
+        await _service.DeleteForTrip(tripId, id);
         return NoContent();
     }
 

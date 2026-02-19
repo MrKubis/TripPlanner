@@ -15,7 +15,7 @@ public class LinkService
         _trips = trips;
     }
 
-    public async Task<UpdateResult> CreateForTrip(string tripId, CreateLinkDto dto)
+    public async Task CreateForTrip(string tripId, CreateLinkDto dto)
     {
         var filter = Builders<Trip>.Filter.Eq(x => x.Id, tripId);
 
@@ -31,10 +31,9 @@ public class LinkService
         {
             throw new NotFoundException(tripId);
         }
-        return result;
     }
 
-    public async Task<UpdateResult> DeleteForTrip(string tripId, string id)
+    public async Task DeleteForTrip(string tripId, string id)
     {
         var filter = Builders<Trip>.Filter.Eq(x => x.Id, tripId);
 
@@ -42,7 +41,10 @@ public class LinkService
             .PullFilter(trip => trip.Links, link => link.Id == id);
 
         var result = await _trips.UpdateOneAsync(filter, pullUpdate);
-        return result;
+        if (result.MatchedCount == 0)
+        {
+            throw new NotFoundException(tripId);
+        }
     }
 
     public async Task<UpdateResult> UpdateForTrip(string tripId, string id, PatchLinkDto dto)
@@ -61,6 +63,10 @@ public class LinkService
 
         var update = Builders<Trip>.Update.Combine(updateDef);
         var result = await _trips.UpdateOneAsync(filter,update);
+        if (result.MatchedCount == 0)
+        {
+            throw new NotFoundException(tripId);
+        }
         return result;
     }
 }
