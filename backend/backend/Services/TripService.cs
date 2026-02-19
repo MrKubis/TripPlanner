@@ -33,7 +33,17 @@ public class TripService
 
     public async Task<Trip> Create(CreateTripDto dto)
     {
-        var trip = new Trip { Title = dto.Title };
+        var trip = new Trip
+        {
+            Title = dto.Title,
+            Links = new List<Link>(),
+            Days = new List<Day>(),
+            Destinations = new List<Destination>(),
+            Expenses = new List<Expense>(),
+            CreatedOn = DateTime.UtcNow,
+            CreatedBy = null
+                
+        };
         await _trips.InsertOneAsync(trip);
 
         return trip;
