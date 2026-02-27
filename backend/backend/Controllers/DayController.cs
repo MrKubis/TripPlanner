@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace backend.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api")]
 public class DayController : BaseApiController
 {
     private readonly DayService _service;
@@ -15,7 +15,7 @@ public class DayController : BaseApiController
         _service = service;
     }
 
-    [HttpPost("/trip/{tripId}")]
+    [HttpPost("/trip/{tripId}/day")]
     public async Task<IActionResult> CreateForTrip(string tripId, [FromBody] CreateDayDto dto)
     {
         await _service.CreateForTrip(tripId, dto);

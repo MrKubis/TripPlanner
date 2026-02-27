@@ -24,6 +24,7 @@ builder.Services.AddSingleton(sp =>
 builder.Services.AddScoped<TripService>();
 builder.Services.AddScoped<LinkService>();
 builder.Services.AddScoped<DayService>();
+builder.Services.AddScoped<DestinationService>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();

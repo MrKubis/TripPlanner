@@ -1,8 +1,15 @@
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace backend.Domain.Entities;
 
 public class Destination
 {
-    private string Name;
-    private Location Location;
-    private List<Link> Links;
+    [BsonId]
+    [BsonElement("_id"),BsonRepresentation(BsonType.ObjectId)]
+    public string? Id {get; set;} = ObjectId.GenerateNewId().ToString();
+
+    public string Name { get; set; }
+    public Location Location { get; set; }
+    public List<Link> Links { get; set; }
 }

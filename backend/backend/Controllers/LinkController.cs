@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace backend.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/")]
 public class LinkController : BaseApiController
 {
     private readonly LinkService _service;
@@ -15,7 +15,7 @@ public class LinkController : BaseApiController
         _service = service;
     }
 
-    [HttpPost("/trip/{tripId}")]
+    [HttpPost("/trip/{tripId}/link")]
     public async Task<IActionResult> CreateForTrip(string tripId, [FromBody] CreateLinkDto dto)
     { 
         await _service.CreateForTrip(tripId, dto);
