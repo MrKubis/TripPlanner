@@ -12,5 +12,5 @@ public class Link
     [BsonElement("url")]
     public string Url { get; set; }
     [BsonElement("title")]
-    public string Title { get; set; }
+    public string? Title { get; set; }
 }
