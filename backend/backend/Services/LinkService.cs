@@ -101,8 +101,7 @@ public class LinkService
         var update = Builders<Trip>.Update
             .PullFilter(
                 new StringFieldDefinition<Trip, List<Link>>("destinations.$[dest].links"),
-                Builders<Link>.Filter.Eq(x => x.Id, id)
-            );
+                Builders<Link>.Filter.Eq(x => x.Id, id));
         var arrayFilters = new List<ArrayFilterDefinition>
         {
             new BsonDocumentArrayFilterDefinition<BsonDocument>(

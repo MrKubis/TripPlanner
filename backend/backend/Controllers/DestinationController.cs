@@ -50,7 +50,7 @@ public class DestinationController : BaseApiController
     [HttpPatch("/trip/{tripId}/day/{dayId}/destination/{id}")]
     public async Task<IActionResult> UpdateForDay(string tripId,string dayId,string id, [FromBody] PatchDestinationDto dto)
     {
-        await _service.UpdateForDay(tripId,id,dto);
+        await _service.UpdateForDay(tripId,dayId,id,dto);
         return NoContent();
     }
 }
