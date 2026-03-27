@@ -14,5 +14,5 @@ public class Destination
     [BsonElement("location")]
     public Location Location { get; set; }
     [BsonElement("links")]
-    public List<Link> Links { get; set; }
+    public List<string> LinkIds { get; set; } = new List<string>();
 }

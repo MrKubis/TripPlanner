@@ -11,5 +11,5 @@ public class Day
     [BsonElement("date")]
     public DateOnly Date {get; set;}
     [BsonElement("destinations")]
-    public List<Destination> Destinations { get; set; } = new List<Destination>();
+    public List<string> DestinationIds { get; set; } = new List<string>();
 }

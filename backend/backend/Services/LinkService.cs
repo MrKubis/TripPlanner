@@ -72,14 +72,17 @@ public class LinkService
 
     public async Task CreateForDestination(string tripId, string destinationId, CreateLinkDto dto)
     {
+        var newLink = new Link
+        {
+            Title = dto.Title,
+            Url = dto.Url
+        };
+        
         var filter = Builders<Trip>.Filter.Eq(x => x.Id, tripId) &
                      Builders<Trip>.Filter.ElemMatch(x => x.Destinations, destination => destination.Id == destinationId);
-        var update = Builders<Trip>.Update
-            .Push("destinations.$[dest].links", new Link
-            {
-                Title = dto.Title,
-                Url = dto.Url
-            });
+        var update = Builders<Trip>.Update.Combine(
+            Builders<Trip>.Update.Push(t => t.Links, newLink),
+            Builders<Trip>.Update.Push("destinations.$[dest].linkIds", newLink.Id));
         var arrayFilters = new List<ArrayFilterDefinition>
         {
             new BsonDocumentArrayFilterDefinition<BsonDocument>(
@@ -98,43 +101,15 @@ public class LinkService
         var filter = Builders<Trip>.Filter.Eq(x => x.Id, tripId) &
                      Builders<Trip>.Filter.ElemMatch(x => x.Destinations,
                          destination => destination.Id == destinationId);
-        var update = Builders<Trip>.Update
-            .PullFilter(
-                new StringFieldDefinition<Trip, List<Link>>("destinations.$[dest].links"),
-                Builders<Link>.Filter.Eq(x => x.Id, id));
+        var update = Builders<Trip>.Update.Combine(
+            Builders<Trip>.Update.PullFilter(t => t.Links, l => l.Id == id),
+                        Builders<Trip>.Update.Pull("destinations.$[dest].linkIds", id)
+            );
+        
         var arrayFilters = new List<ArrayFilterDefinition>
         {
             new BsonDocumentArrayFilterDefinition<BsonDocument>(
                 new BsonDocument("dest._id", ObjectId.Parse(destinationId)))
-        };
-        var options = new UpdateOptions { ArrayFilters = arrayFilters };
-        var result = await _trips.UpdateOneAsync(filter, update, options);
-        if (result.MatchedCount == 0)
-        {
-            throw new NotFoundException(tripId);
-        }
-    }
-
-    public async Task UpdateForDestination(string tripId, string destinationId, string id, PatchLinkDto dto)
-    {
-        var filter = Builders<Trip>.Filter.Eq(x => x.Id, tripId);
-        var updateDef = new List<UpdateDefinition<Trip>>();
-        if (dto.Url != null)
-        {
-            updateDef.Add(Builders<Trip>.Update.Set("destinations.$[dest].links.$[link].url",dto.Url));
-        }
-
-        if (dto.Title != null)
-        {
-            updateDef.Add(Builders<Trip>.Update.Set("destinations.$[dest].links.$[link].title", dto.Title));
-        }
-        var update = Builders<Trip>.Update.Combine(updateDef);
-        var arrayFilters = new List<ArrayFilterDefinition>
-        {
-            new BsonDocumentArrayFilterDefinition<BsonDocument>(
-                new BsonDocument("dest._id", ObjectId.Parse(destinationId))),
-            new BsonDocumentArrayFilterDefinition<BsonDocument>(
-                new BsonDocument("link._id", ObjectId.Parse(id))),
         };
         var options = new UpdateOptions { ArrayFilters = arrayFilters };
         var result = await _trips.UpdateOneAsync(filter, update, options);
