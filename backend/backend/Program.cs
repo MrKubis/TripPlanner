@@ -21,6 +21,19 @@ builder.Services.AddSingleton(sp =>
     return db.GetCollection<Trip>("trips");
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("localhost",
+        builder =>
+        {
+            builder
+                .WithOrigins("http://localhost:3000")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        });
+});
+
 builder.Services.AddScoped<TripService>();
 builder.Services.AddScoped<LinkService>();
 builder.Services.AddScoped<DayService>();
@@ -37,6 +50,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("localhost");
 
 app.UseExceptionHandler(_ => { });
 app.UseHttpsRedirection();
