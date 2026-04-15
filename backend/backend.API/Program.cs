@@ -1,0 +1,51 @@
+using backend.Application.Extenstions;
+using backend.Domain.Entities;
+using backend.Infrastructure.Extensions;
+using backend.Infrastructure.Settings;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddControllers();
+
+
+builder.Services.Configure<DatabaseSettings>(
+    builder.Configuration.GetSection("DatabaseSettings"));
+
+builder.Services.AddSingleton<IMongoClient>(sp =>
+{
+    var settings = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
+    return new MongoClient(settings.ConnectionString);
+});
+
+builder.Services.AddSingleton<IMongoCollection<Trip>>(sp =>
+{
+    var client = sp.GetRequiredService<IMongoClient>();
+    var settings = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
+    return client.GetDatabase(settings.DatabaseName)
+        .GetCollection<Trip>(settings.TripCollectionName);
+});
+
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.MapControllers();
+
+app.UseHttpsRedirection();
+
+app.Run();
