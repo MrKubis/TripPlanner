@@ -76,7 +76,8 @@ public class LinkRepository : ILinkRepository
         if (result.MatchedCount == 0) return LinkRepositoryResult.DestinationNotFound;
         return LinkRepositoryResult.Success;
     }
-
+    
+    /*
     public async Task<LinkRepositoryResult> DeleteForDestination(string tripId, string destinationId, string id)
     {
         var trip = await _trips.Find(x => x.Id == tripId).FirstOrDefaultAsync();
@@ -90,7 +91,7 @@ public class LinkRepository : ILinkRepository
         var filter = Builders<Trip>.Filter.Eq(x => x.Id, tripId) &
                      Builders<Trip>.Filter.ElemMatch(x => x.Links, link=> link.Id == id);
         var update = Builders<Trip>.Update.Combine(
-            Builders<Trip>.Update.PullFilter(t=>t.Destinations, destination => destination.Id == destinationId),
+            Builders<Trip>.Update.PullFilter(t=>t.Links, link => link.Id == id),
             Builders<Trip>.Update.Pull("destinations.$[dest].linkIds",id));
         var arrayFilters = new List<ArrayFilterDefinition>
         {
@@ -104,5 +105,56 @@ public class LinkRepository : ILinkRepository
             return LinkRepositoryResult.DestinationNotFound;
         }
         return LinkRepositoryResult.Success;
+    }
+    */
+    
+    public async Task<LinkRepositoryResult> AppendToDestination(string tripId, string destinationId, string id)
+    {
+        var trip = await _trips.Find(t => t.Id == tripId).FirstOrDefaultAsync();
+        if (trip == null) return LinkRepositoryResult.TripNotFound;
+        
+        var destinationExists = trip.Destinations.Any(d => d.Id == destinationId);
+        if (!destinationExists) return LinkRepositoryResult.DestinationNotFound;
+       
+        var linkExists = trip.Links.Any(l => l.Id == id);
+        if (!linkExists) return LinkRepositoryResult.LinkNotFound;
+        
+        var filter =  Builders<Trip>.Filter.Eq(t => t.Id, tripId) &
+                      Builders<Trip>.Filter.ElemMatch(x => x.Links, link=> link.Id == id);
+        
+        var update = Builders<Trip>.Update.Push("destinations.$[dest].linkIds", id);
+        var arrayFilters = new List<ArrayFilterDefinition>
+        {
+            new BsonDocumentArrayFilterDefinition<BsonDocument>(
+                new BsonDocument("dest._id", ObjectId.Parse(destinationId))),
+        };
+        var options = new UpdateOptions { ArrayFilters = arrayFilters };
+        await _trips.UpdateOneAsync(filter, update, options);
+
+        return LinkRepositoryResult.Success;
+    }
+
+    public async Task<LinkRepositoryResult> RemoveFromDestination(string tripId, string destinationId, string id)
+    {
+        var trip = await _trips.Find(t => t.Id == tripId).FirstOrDefaultAsync();
+        if (trip == null) return LinkRepositoryResult.TripNotFound;
+        
+        var destinationExists = trip.Destinations.Any(d => d.Id == id);
+        if (!destinationExists) return LinkRepositoryResult.DestinationNotFound;
+       
+        var filter =  Builders<Trip>.Filter.Eq(t => t.Id, tripId) &
+                      Builders<Trip>.Filter.ElemMatch(x => x.Links, link=> link.Id == id);
+        
+        var update = Builders<Trip>.Update.Pull("destinations.$[dest].linkIds", id);
+        var arrayFilters = new List<ArrayFilterDefinition>
+        {
+            new BsonDocumentArrayFilterDefinition<BsonDocument>(
+                new BsonDocument("dest._id", ObjectId.Parse(destinationId))),
+        };
+        var options = new UpdateOptions { ArrayFilters = arrayFilters };
+        var result = await _trips.UpdateOneAsync(filter, update, options);
+        
+        if (result.MatchedCount == 0) return LinkRepositoryResult.DestinationNotFound;
+        return LinkRepositoryResult.Success;    
     }
 }

@@ -34,17 +34,17 @@ public class LinkController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("/trip/{tripId}/destination/{destinationId}/link")]
-    public async Task<IActionResult> CreateForDestination(string tripId, string destinationId,[FromBody] CreateLinkDto dto)
+    [HttpPatch("/trip/{tripId}/destination/{destinationId}/append/link/{id}")]
+    public async Task<IActionResult> AppendLinkToDestination(string tripId, string destinationId, string id)
     {
-        await _service.CreateForDestination(tripId,destinationId,dto);
-        return Created();
+        await _service.AppendLinkToDestination(tripId, destinationId, id);
+        return Ok();
     }
 
-    [HttpDelete("/trip/{tripId}/destination/{destinationId}/link/{id}")]
-    public async Task<IActionResult> DeleteForDestination(string tripId, string destinationId, string id)
+    [HttpPatch("/trip/{tripId}/destination/{destinationId}/remove/link/{id}")]
+    public async Task<IActionResult> RemoveLinkToDestination(string tripId, string destinationId, string id)
     {
-        await _service.DeleteForDestination(tripId, destinationId, id);
-        return NoContent();
+        await _service.RemoveLinkFromDestination(tripId, destinationId, id);
+        return Ok();
     }
 }

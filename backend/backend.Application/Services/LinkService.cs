@@ -73,14 +73,25 @@ public class LinkService
         };
     }
 
-    public async Task DeleteForDestination(string tripId, string destinationId, string id)
+    public async Task AppendLinkToDestination(string tripId, string destinationId, string id)
     {
-        var result = await _linkRepository.DeleteForDestination(tripId, destinationId, id);
-        switch(result)
+        var result = await _linkRepository.AppendToDestination(tripId, destinationId, id);
+        switch (result)
         {
-           case LinkRepositoryResult.TripNotFound : throw new NotFoundException(typeof(Trip), tripId);
-           case LinkRepositoryResult.DestinationNotFound : throw new NotFoundException(typeof(Destination), destinationId);
-           case LinkRepositoryResult.Success : return;
+            case  LinkRepositoryResult.TripNotFound: throw new NotFoundException(typeof(Trip), tripId);
+            case  LinkRepositoryResult.DestinationNotFound: throw new NotFoundException(typeof(Destination), destinationId);
+            case  LinkRepositoryResult.LinkNotFound: throw new NotFoundException(typeof(Link), id);
+        }
+    }
+
+    public async Task RemoveLinkFromDestination(string tripId, string destinationId, string id)
+    {
+        var result = await _linkRepository.RemoveFromDestination(tripId, destinationId, id);
+        switch (result)
+        {
+            case  LinkRepositoryResult.TripNotFound: throw new NotFoundException(typeof(Trip), tripId);
+            case  LinkRepositoryResult.DestinationNotFound: throw new NotFoundException(typeof(Destination), destinationId);
+            case  LinkRepositoryResult.LinkNotFound: throw new NotFoundException(typeof(Link), id);
         }
     }
 }

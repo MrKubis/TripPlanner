@@ -8,7 +8,9 @@ public interface ILinkRepository
     Task<LinkRepositoryResult> UpdateForTrip(string tripId, Link link);
     Task<LinkRepositoryResult> DeleteForTrip(string tripId, string linkId);
     Task<LinkRepositoryResult> CreateForDestination(string tripId, string destinationId, Link link);
-    Task<LinkRepositoryResult> DeleteForDestination(string tripId, string destinationId, string id);
+    //Task<LinkRepositoryResult> DeleteForDestination(string tripId, string destinationId, string id);
+    Task<LinkRepositoryResult> AppendToDestination(string tripId, string destinationId, string id);
+    Task<LinkRepositoryResult> RemoveFromDestination(string tripId, string destinationId, string id);
 }
 
 public enum LinkRepositoryResult
