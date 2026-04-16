@@ -1,7 +1,7 @@
 using backend.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace backend.Application.Extenstions;
+namespace backend.Application.Extensions;
 
 public static class ServiceCollectionExtensions
 {

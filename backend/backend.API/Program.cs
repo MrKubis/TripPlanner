@@ -1,4 +1,5 @@
-using backend.Application.Extenstions;
+using backend.API.Exceptions.Handlers;
+using backend.Application.Extensions;
 using backend.Domain.Entities;
 using backend.Infrastructure.Extensions;
 using backend.Infrastructure.Settings;
@@ -9,11 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddControllers();
-
 
 builder.Services.Configure<DatabaseSettings>(
     builder.Configuration.GetSection("DatabaseSettings"));
@@ -35,6 +39,14 @@ builder.Services.AddSingleton<IMongoCollection<Trip>>(sp =>
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
 
+builder.Services.AddProblemDetails(configure =>
+{
+    configure.CustomizeProblemDetails = context =>
+    {
+        context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
+    };
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -43,6 +55,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseExceptionHandler();
 
 app.MapControllers();
 

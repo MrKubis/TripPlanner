@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace backend.API.Exceptions.Handlers;
 
-public class NotFoundExceptionHandler : IExceptionHandler
+public class NotFoundExceptionHandler(
+    IProblemDetailsService problemDetailsService) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
@@ -16,18 +17,21 @@ public class NotFoundExceptionHandler : IExceptionHandler
             return false;
         }
 
-        var problemDetails = new ProblemDetails
+        var message = notFoundException.Message;
+
+        httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+
+        var context = new ProblemDetailsContext
         {
-            Status = StatusCodes.Status404NotFound,
-            Title = "Not Found",
-            Detail = notFoundException.Message
+            HttpContext = httpContext,
+            Exception = exception,
+            ProblemDetails = new ProblemDetails
+            {
+                Detail = message,
+                Status = StatusCodes.Status404NotFound,
+            }
         };
-
-        httpContext.Response.StatusCode = problemDetails.Status.Value;
-
-        await httpContext.Response
-            .WriteAsJsonAsync(problemDetails, cancellationToken);
-
+        await problemDetailsService.TryWriteAsync(context);
         return true;
     }
 }
