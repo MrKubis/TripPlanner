@@ -11,7 +11,7 @@ public class DestinationService
 {
     private IDestinationRepository _destinationRepository;
     
-    public DestinationService(IMongoCollection<Trip> trips, IDestinationRepository destinationRepository)
+    public DestinationService(IDestinationRepository destinationRepository)
     {
         _destinationRepository = destinationRepository;
     }
@@ -66,15 +66,26 @@ public class DestinationService
             _ => throw new ArgumentOutOfRangeException(null)
         };
     }
-
-    public async Task DeleteForDay(string tripId, string dayId, string id)
+    public async Task AppendDestinationToDay(string tripId, string dayId, string destinationId)
     {
-        var result = await _destinationRepository.DeleteForDay(tripId, dayId, id);
+        var result = await _destinationRepository.AppendToDay(tripId, dayId, destinationId);
         switch (result)
         {
-           case DestinationRepositoryResult.TripNotFound : throw new NotFoundException(typeof(Trip), tripId);
-           case DestinationRepositoryResult.DayNotFound : throw new NotFoundException(typeof(Day), dayId);
-           case DestinationRepositoryResult.DestinationNotFound : throw new NotFoundException(typeof(Destination), id);
+            case DestinationRepositoryResult.TripNotFound : throw new NotFoundException(typeof(Trip), tripId);
+            case DestinationRepositoryResult.DayNotFound : throw new NotFoundException(typeof(Day), dayId);
+            case DestinationRepositoryResult.DestinationNotFound : throw new NotFoundException(typeof(Destination), destinationId);
         }
-    } 
+    }
+
+    public async Task RemoveDestinationFromDay(string tripId, string dayId, string destinationId)
+    {
+        var result = await _destinationRepository.RemoveFromDay(tripId, dayId, destinationId);
+        switch (result)
+        {
+            case DestinationRepositoryResult.TripNotFound : throw new NotFoundException(typeof(Trip), tripId);
+            case DestinationRepositoryResult.DayNotFound : throw new NotFoundException(typeof(Day), dayId);
+            case DestinationRepositoryResult.DestinationNotFound : throw new NotFoundException(typeof(Destination), destinationId);
+        }
+        
+    }
 }

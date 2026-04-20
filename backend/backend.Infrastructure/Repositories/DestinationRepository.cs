@@ -104,4 +104,62 @@ public class DestinationRepository: IDestinationRepository
         }
         return DestinationRepositoryResult.Success;
     }
+
+    public async Task<DestinationRepositoryResult> AppendToDay(string tripId, string dayId, string id)
+    {
+        var trip =  await _trips.Find(x => x.Id == tripId).FirstOrDefaultAsync();
+        if (trip == null)
+        {
+            return DestinationRepositoryResult.TripNotFound;
+        }
+        var destinationExists = trip.Destinations.Any(d => d.Id == id);
+        if (!destinationExists)
+        {
+            return DestinationRepositoryResult.DestinationNotFound;
+        }
+        var filter =  Builders<Trip>.Filter.Eq(t => t.Id, tripId) &
+                      Builders<Trip>.Filter.ElemMatch(x => x.Destinations, destination=> destination.Id == id);
+        
+        var update = Builders<Trip>.Update.Push("days.$[day].destinationIds", id);
+        var arrayFilters = new List<ArrayFilterDefinition>
+        {
+            new BsonDocumentArrayFilterDefinition<BsonDocument>(
+                new BsonDocument("day._id", ObjectId.Parse(dayId))),
+        };
+        var options = new UpdateOptions { ArrayFilters = arrayFilters };
+        var result = await _trips.UpdateOneAsync(filter, update, options);
+
+        if(result.MatchedCount == 0) return DestinationRepositoryResult.DayNotFound;
+        
+        return DestinationRepositoryResult.Success;
+    }
+
+    public async Task<DestinationRepositoryResult> RemoveFromDay(string tripId, string dayId, string id)
+    {
+        var trip =  await _trips.Find(x => x.Id == tripId).FirstOrDefaultAsync();
+        if (trip == null)
+        {
+            return DestinationRepositoryResult.TripNotFound;
+        }
+        var destinationExists = trip.Destinations.Any(d => d.Id == id);
+        if (!destinationExists)
+        {
+            return DestinationRepositoryResult.DestinationNotFound;
+        }
+        var filter =  Builders<Trip>.Filter.Eq(t => t.Id, tripId) &
+                      Builders<Trip>.Filter.ElemMatch(x => x.Destinations, destination=> destination.Id == id);
+        
+        var update = Builders<Trip>.Update.Pull("days.$[day].destinationIds", id);
+        var arrayFilters = new List<ArrayFilterDefinition>
+        {
+            new BsonDocumentArrayFilterDefinition<BsonDocument>(
+                new BsonDocument("day._id", ObjectId.Parse(dayId))),
+        };
+        var options = new UpdateOptions { ArrayFilters = arrayFilters };
+        var result = await _trips.UpdateOneAsync(filter, update, options);
+
+        if(result.MatchedCount == 0) return DestinationRepositoryResult.DayNotFound;
+        
+        return DestinationRepositoryResult.Success;
+    }
 }
