@@ -154,7 +154,7 @@ public class LinkRepository : ILinkRepository
         var options = new UpdateOptions { ArrayFilters = arrayFilters };
         var result = await _trips.UpdateOneAsync(filter, update, options);
         
-        if (result.MatchedCount == 0) return LinkRepositoryResult.DestinationNotFound;
+        if (result.MatchedCount == 0) return LinkRepositoryResult.LinkNotFound;
         return LinkRepositoryResult.Success;    
     }
 }
