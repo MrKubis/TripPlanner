@@ -14,10 +14,10 @@ public class LinkController : ControllerBase
     }
 
     [HttpPost("/trip/{tripId}/link")]
-    public async Task<IActionResult> CreateForTrip(string tripId, [FromBody] CreateLinkDto dto)
+    public async Task<ActionResult<LinkDto>> CreateForTrip(string tripId, [FromBody] CreateLinkDto dto)
     { 
-        await _service.CreateForTrip(tripId, dto);
-        return Created();
+        var result = await _service.CreateForTrip(tripId, dto);
+        return Ok(result);
     }
 
     [HttpDelete("/trip/{tripId}/link/{id}")]

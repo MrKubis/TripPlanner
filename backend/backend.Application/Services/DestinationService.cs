@@ -3,7 +3,6 @@ using backend.Application.Exceptions.Exceptions;
 using backend.Application.Mappers;
 using backend.Domain.Entities;
 using backend.Domain.Repositories;
-using MongoDB.Driver;
 
 namespace backend.Application.Services;
 

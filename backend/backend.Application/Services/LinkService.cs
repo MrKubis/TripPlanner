@@ -11,7 +11,7 @@ public class LinkService
 {
 
     private ILinkRepository _linkRepository;
-    public LinkService(IMongoCollection<Trip> trips, ILinkRepository linkRepository)
+    public LinkService(ILinkRepository linkRepository)
     {
         _linkRepository = linkRepository;
     }
