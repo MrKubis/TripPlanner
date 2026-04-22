@@ -1,0 +1,9 @@
+<p>trip-list works!</p>
+<ul>
+@for (trip of store.trips(); track trip.id) {
+    <li>
+        {{trip.title}}
+        <a routerLink="/trip/{{trip.id}}">Link</a>
+    </li>
+}
+</ul>

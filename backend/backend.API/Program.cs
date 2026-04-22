@@ -46,9 +46,15 @@ builder.Services.AddProblemDetails(configure =>
         context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
     };
 });
-
+builder.Services.AddCors(options => {
+    options.AddPolicy("Dev", policy => {
+        policy.WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 var app = builder.Build();
-
+app.UseCors("Dev");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
