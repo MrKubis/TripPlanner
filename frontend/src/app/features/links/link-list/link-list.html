@@ -1,0 +1,10 @@
+<h1>Links</h1>
+<button routerLink="/trip/{{store.selectedTrip()?.id}}/links">Go to links</button>
+<ul>
+    @for (link of store.selectedTrip()?.links; track $index) {
+        <li>
+            <p>{{link.title}}</p>
+            <p>{{link.url}}</p>
+        </li>
+    }
+</ul>

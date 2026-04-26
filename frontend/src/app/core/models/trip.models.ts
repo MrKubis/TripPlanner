@@ -30,8 +30,17 @@ export interface Day{
     destinationIds: string[]
 }
 export interface Destination {
-
+    id:string,
+    name: string,
+    location: Location,
+    linkIds: string[]
 }
 export interface Link {
-
+    id: string,
+    url: string,
+    title: string
+}
+export interface Location{
+    latitude: number,
+    longitude: number
 }

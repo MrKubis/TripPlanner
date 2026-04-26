@@ -1,0 +1,8 @@
+<h1>Days</h1>
+<ul>
+@for (day of store.selectedTrip()?.days; track day.id) {
+    <li>
+        <p>{{day.date}}</p>
+    </li>    
+}
+</ul>

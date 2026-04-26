@@ -1,11 +1,14 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Trip } from '../../../core/models/trip.models';
 import { TripStore } from '../../../core/stores/trip-store';
+import { DestinationList } from "../../destinations/destination-list/destination-list";
+import { DayList } from "../../days/day-list/day-list";
+import { LinkList } from '../../links/link-list/link-list';
 
 @Component({
   selector: 'app-trip-card',
-  imports: [],
+  imports: [DestinationList, DayList, LinkList],
   templateUrl: './trip-card.html',
   styleUrl: './trip-card.css',
 })
@@ -20,5 +23,5 @@ export class TripCard  implements OnInit{
         this.store.loadTrip(id);
       }
     })
-  }
+ }
 }

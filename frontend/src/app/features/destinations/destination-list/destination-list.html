@@ -1,0 +1,7 @@
+<h1>Destinations</h1>
+@for (destination of this.store.selectedTrip()?.destinations; track destination.id) {
+    <ul>
+        <h2>{{destination.name}}</h2>
+        <h2>{{destination.location.latitude}}, {{destination.location.longitude}}</h2>
+    </ul>
+}

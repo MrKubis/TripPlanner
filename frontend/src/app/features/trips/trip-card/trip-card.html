@@ -1,5 +1,18 @@
-<p>trip-card works!</p>
 @if (store.selectedTrip(); as trip) {
-    <h1>{{trip.title}}</h1>
-    <h2>{{trip.description}}</h2>
+    <div>
+        <h1 class="text-2xl">{{trip.title}}</h1>
+        <h3>{{trip.description}}</h3>
+    </div>
+
+    <div class="flex flex-row flex-s justify-between mx-10">
+        <app-destination-list/>
+        <app-day-list/>
+        <app-link-list/>
+    </div>
+
+}
+@else {
+    <h1>
+        No trip was found...
+    </h1>
 }

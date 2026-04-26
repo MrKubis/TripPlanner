@@ -19,7 +19,11 @@ public class DayRepository : IDayRepository
     {
         var filter =  Builders<Trip>.Filter.Eq(x => x.Id, tripId);
         var update = Builders<Trip>.Update
-            .Push(trip => trip.Days, day);
+            .PushEach(
+                trip => trip.Days,
+                [day],
+                sort: Builders<Day>.Sort.Ascending(d=>d.Date)
+                );
         var result = await _trips.UpdateOneAsync(filter, update);
         
         if (result.MatchedCount == 0) return DayRepositoryResult.TripNotFound;
