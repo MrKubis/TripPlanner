@@ -5,10 +5,22 @@
 @tailwind utilities;
 /* You can add global styles to this file, and also import other style files */
 
+@font-face {
+    font-family: jetbrains-mono;
+    src: url('assets/fonts/JetBrains_Mono/JetBrainsMono-VariableFont_wght.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
 
 h1{
     font-size: xx-large;
 }
 h2{
     font-size:large
+}
+
+html, body, form, fieldset, table, tr, td, img {
+    margin: 0;
+    padding: 0;
+    font: 100%/150% 'jetbrains-mono',helvetica,sans-serif;
 }

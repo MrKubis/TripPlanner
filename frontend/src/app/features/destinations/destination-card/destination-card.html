@@ -1,0 +1,26 @@
+<h1>Destinations</h1>
+<ul>
+    @for (destination of store.selectedTrip()?.destinations; track $index) {
+        <li class="flex flex-row">
+            <div>
+                <p>{{destination.name}}</p>
+                <p>{{destination.location.latitude}}, {{destination.location.longitude}}</p>
+                <div class="flex gap-2">
+                    <button>Edit</button>
+                    <button>Delete</button>
+                </div>
+            </div>
+            <div>
+                <ul>
+                @for (link of store.selectedTrip()?.links?.
+                filter(l=>destination.linkIds.includes(l.id)); track $index) {
+                    <li>
+                        <p>{{link.title}}</p>
+                        <p>{{link.url}}</p>
+                    </li>    
+                }   
+                </ul> 
+            </div>
+        </li>
+    }
+</ul>
