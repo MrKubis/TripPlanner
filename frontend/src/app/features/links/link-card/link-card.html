@@ -1,0 +1,26 @@
+    <div class="py-3">
+        <h1 class="mx-10">Links</h1>
+    </div>
+<div>
+
+    <ul class="flex flex-col gap-5 mx-10">
+        @for (link of store.selectedTrip()?.links; track $index) {
+            <li class="bg-zinc-100 p-4">
+                <div class="flex justify-between">
+                    <div class = "flex gap-2 flex-col">
+                        <p class="font-semibold">{{link.title}}</p>
+                        <a class="text-blue-500" href="{{link.url}}">
+                            {{link.url}}
+                        </a>
+                    </div>
+                    <div class=" text-center content-center flex gap-4">
+                        <app-button >Delete</app-button>
+                        <app-button >Edit</app-button>
+                    </div>
+                </div>
+
+            </li>
+        }
+    </ul>
+</div>
+

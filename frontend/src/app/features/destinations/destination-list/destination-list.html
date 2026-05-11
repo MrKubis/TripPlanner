@@ -1,4 +1,5 @@
 <h1>Destinations</h1>
+<button routerLink="/trip/{{store.selectedTrip()?.id}}/destinations">Go to destinations</button>
 @for (destination of this.store.selectedTrip()?.destinations; track destination.id) {
     <ul>
         <h2>{{destination.name}}</h2>

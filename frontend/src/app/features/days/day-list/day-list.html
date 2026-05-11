@@ -1,4 +1,5 @@
 <h1>Days</h1>
+<button routerLink="/trip/{{store.selectedTrip()?.id}}/days">Go to days</button>
 <ul>
 @for (day of store.selectedTrip()?.days; track day.id) {
     <li>
