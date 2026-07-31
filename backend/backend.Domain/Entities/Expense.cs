@@ -1,18 +1,11 @@
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-
 namespace backend.Domain.Entities;
 
-public class Expense
+public class Expense : BaseEntity
 {
-    [BsonId]
-    [BsonElement("_id"),BsonRepresentation(BsonType.ObjectId)]
-    public string? Id {get; set;} = ObjectId.GenerateNewId().ToString();
-
-    [BsonElement("name")]
     public string Name { get; set; }
-    [BsonElement("description")]
     public string Description { get; set; }
-    [BsonElement("price")]
-    public double Price {get; set;}
+    public decimal Price {get; set;}
+    
+    public Trip Trip { get; set; }
+    public Guid TripId { get; set; }
 }

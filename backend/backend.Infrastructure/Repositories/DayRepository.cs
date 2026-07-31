@@ -1,58 +1,64 @@
+using backend.Domain.Common.Results;
 using backend.Domain.Entities;
 using backend.Domain.Repositories;
-using backend.Infrastructure.Settings;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
+using backend.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Infrastructure.Repositories;
 
-public class DayRepository : IDayRepository
+public class DayRepository(AppDbContext context) : IDayRepository
 {
-    private readonly IMongoCollection<Trip> _trips;
-
-    public DayRepository(IMongoCollection<Trip> trips)
+    public async Task<Result> CreateForTripAsync(Guid tripId, Day day)
     {
-        _trips = trips;
-    }
-    
-    public async Task<DayRepositoryResult> CreateForTrip(string tripId, Day day)
-    {
-        var filter =  Builders<Trip>.Filter.Eq(x => x.Id, tripId);
-        var update = Builders<Trip>.Update
-            .PushEach(
-                trip => trip.Days,
-                [day],
-                sort: Builders<Day>.Sort.Ascending(d=>d.Date)
-                );
-        var result = await _trips.UpdateOneAsync(filter, update);
+        var tripExists = await context.Trips.AnyAsync(x => x.Id == tripId);
+        if (!tripExists)
+        {
+            return Result.Failure("Trip not found", ErrorType.NotFound);
+        }
+        day.TripId = tripId;
+        context.Days.Add(day);
+        await context.SaveChangesAsync();
         
-        if (result.MatchedCount == 0) return DayRepositoryResult.TripNotFound;
-        return DayRepositoryResult.Success; 
+        return Result.Success();
     }
 
-    public async Task<DayRepositoryResult> DeleteForTrip(string tripId, string dayId)
+    public async Task<Result> DeleteAsync(Guid dayId)
     {
-        var filter = Builders<Trip>.Filter.Eq(x => x.Id, tripId);
-        var update = Builders<Trip>.Update
-            .PullFilter(trip => trip.Days, day => day.Id == dayId);
-        var result = await _trips.UpdateOneAsync(filter, update);
+        await context.Days
+            .Where(x => x.Id == dayId)
+            .ExecuteDeleteAsync();
         
-        if (result.MatchedCount == 0) return DayRepositoryResult.TripNotFound;
-        if (result.ModifiedCount == 0) return DayRepositoryResult.DayNotFound;
-        return DayRepositoryResult.Success; 
+        return Result.Success();
     }
 
-    public async Task<DayRepositoryResult> UpdateForTrip(string tripId, Day day)
+    public async Task<Result> UpdateAsync(Day day)
     {
-        var tripExists = await _trips.Find(x => x.Id == tripId).AnyAsync();
-        if(!tripExists) return DayRepositoryResult.TripNotFound;
+        var existingDay = await context.Days.FirstOrDefaultAsync(x => x.Id == day.Id);
+        if (existingDay == null)
+        {
+            return Result.Failure("Day not found", ErrorType.NotFound);
+        }
+
+        existingDay.Date = day.Date;
+        return Result.Success();
+    }
+
+    public async Task<Result> AppendDestinationAsync(Guid dayId, Guid destinationId)
+    {
+        var destination = await context.Destinations
+            .FirstOrDefaultAsync(x => x.Id == destinationId);
+        if (destination == null)
+        {
+            return Result.Failure("Destination not found", ErrorType.NotFound);
+        }
         
-        var filter = Builders<Trip>.Filter.Eq(x => x.Id, tripId) &
-                     Builders<Trip>.Filter.ElemMatch(x=>x.Days, tDay => tDay.Id == day.Id);
-        var update = Builders<Trip>.Update.Set("Days.$", day);
-        var result = await _trips.UpdateOneAsync(filter, update);
-        
-        if (result.MatchedCount == 0) return DayRepositoryResult.DayNotFound;
-        return DayRepositoryResult.Success;  
+        var day = await context.Days.FirstOrDefaultAsync(x => x.Id == dayId);
+        if (day == null)
+        {
+            return Result.Failure("Day not found", ErrorType.NotFound);
+        }
+        day.Destinations.Add(destination);
+        await context.SaveChangesAsync();
+        return Result.Success();
     }
 }

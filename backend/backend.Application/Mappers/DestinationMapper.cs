@@ -11,7 +11,6 @@ public static class DestinationMapper
         {
             Id = destination.Id,
             Name = destination.Name,
-            LinkIds = destination.LinkIds,
             Location = destination.Location.ToDto()
         };
     }
@@ -29,7 +28,7 @@ public static class DestinationMapper
         };
     }
 
-    public static Destination ToEntity(this UpdateDestinationDto dto, string id)
+    public static Destination ToEntity(this UpdateDestinationDto dto, Guid id)
     {
         return new Destination
         {

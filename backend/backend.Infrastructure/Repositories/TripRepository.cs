@@ -1,87 +1,44 @@
 using backend.Domain.Entities;
 using backend.Domain.Repositories;
 using backend.Domain.Specifications;
-using backend.Infrastructure.Settings;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
+using backend.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Infrastructure.Repositories;
 
-public class TripRepository : ITripRepository
+public class TripRepository(AppDbContext context) : ITripRepository
 {
-    private readonly IMongoCollection<Trip> _trips;
-    
-    public TripRepository(IMongoCollection<Trip> trips)
+    public async Task<ICollection<Trip>> GetPaginationAsync(CatalogSpecParams catalogSpecParams)
     {
-        _trips = trips;
-    }
-    
-    public async Task<Pagination<Trip>> GetAllAsync(CatalogSpecParams catalogSpecParams)
-    {
-        var builder = Builders<Trip>.Filter;
-        var filter = builder.Empty;
-        if (!string.IsNullOrWhiteSpace(catalogSpecParams.Search))
-        {
-            filter &= builder.Where(t => t.Title.ToLower()
-                .Contains(catalogSpecParams.Search.ToLower()));
-        }
-        var totalItems = await _trips.CountDocumentsAsync(filter);
-        var data = await ApplyDataFilters(filter, catalogSpecParams);
-
-        return new Pagination<Trip>(
-            catalogSpecParams.PageIndex,
-            catalogSpecParams.PageSize,
-            (int)totalItems,
-            data);
-    }
-
-    private async Task<IReadOnlyCollection<Trip>> ApplyDataFilters(FilterDefinition<Trip> filter,
-        CatalogSpecParams catalogSpecParams)
-    {
-        var sortDefinition = Builders<Trip>.Sort.Ascending("Name");
-        if (!string.IsNullOrEmpty(catalogSpecParams.Sort))
-        {
-            sortDefinition = catalogSpecParams.Sort switch
-            {
-                "titleAsc" => Builders<Trip>.Sort.Ascending(t => t.Title),
-                "titleDesc" => Builders<Trip>.Sort.Descending(t => t.Title),
-                _ => Builders<Trip>.Sort.Ascending(t => t.Title)
-            };
-        }
-        return await _trips
-            .Find(filter)
-            .Sort(sortDefinition)
+        return await context.Trips
             .Skip(catalogSpecParams.PageSize * (catalogSpecParams.PageIndex - 1))
-            .Limit(catalogSpecParams.PageSize)
+            .Take(catalogSpecParams.PageSize)
             .ToListAsync();
     }
 
-    public async Task<Trip?> GetByIdAsync(string tripId)
+    public async Task<Trip?> GetByIdAsync(Guid tripId)
     {
-        var filter =  Builders<Trip>.Filter.Eq(x => x.Id,tripId);
-        var trip = await _trips.Find(filter).FirstOrDefaultAsync();
-        return trip;
+        return await context.Trips.FirstOrDefaultAsync(t => t.Id == tripId);
     }
 
     public async Task<Trip> CreateAsync(Trip trip)
     {    
-        await _trips.InsertOneAsync(trip);
+        await context.Trips.AddAsync(trip);
         return trip;
     }
 
-    public async Task<bool> DeleteAsync(string tripId)
+    public async Task<bool> DeleteAsync(Guid tripId)
     {
-        var deletedTrip = await _trips.DeleteOneAsync(t => t.Id == tripId);
-        return deletedTrip.IsAcknowledged && deletedTrip.DeletedCount > 0;
+        await context.Trips
+            .Where(t => t.Id == tripId)
+            .ExecuteDeleteAsync();
+        return true;
     }
 
-    public async Task<bool> UpdateAsync(string tripId, Trip trip)
+    public async Task<bool> UpdateAsync(Trip trip)
     {
-        var filter = Builders<Trip>.Filter.Eq(x => x.Id, tripId);
-        var update = Builders<Trip>.Update
-            .Set(x => x.Title, trip.Title)
-            .Set(x => x.Description, trip.Description);
-        var result = await _trips.UpdateOneAsync(filter, update);
-        return result.IsAcknowledged && result.MatchedCount > 0;
+        context.Trips.Update(trip);
+        await context.SaveChangesAsync();
+        return true;
     }
 }

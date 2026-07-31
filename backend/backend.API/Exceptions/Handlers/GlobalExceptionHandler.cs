@@ -1,7 +1,6 @@
 using backend.Application.Exceptions.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 
 namespace backend.API.Exceptions.Handlers;
 
@@ -23,8 +22,8 @@ public class GlobalExceptionHandler(
         if (isAlreadyHandled) return true;
         
         httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-        
-        logger.LogError(exception,exception.Message);
+
+        logger.LogError(exception, exception.Message);
 
         await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
@@ -37,6 +36,7 @@ public class GlobalExceptionHandler(
                 Detail = exception.Message
             }
         });
+
         return true;
     }
 

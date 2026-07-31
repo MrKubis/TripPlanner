@@ -19,18 +19,18 @@ public static class LinkMapper
     {
         return new Link
         {
-            Title = dto.Title,
+            Title = dto.Title ?? string.Empty,
             Url = dto.Url,
         };
     }
 
-    public static Link ToEntity(this UpdateLinkDto dto,string id)
+    public static Link ToEntity(this UpdateLinkDto dto, Guid id)
     {
         return new Link
         {
             Id = id,
-            Title = dto.Title,
-            Url = dto.Url,
+            Title = dto.Title ?? string.Empty,
+            Url = dto.Url ?? string.Empty,
         };
     }
 }

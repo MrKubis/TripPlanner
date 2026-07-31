@@ -1,55 +1,48 @@
 using backend.Application.DTOs;
-using backend.Application.Exceptions.Exceptions;
 using backend.Application.Mappers;
-using backend.Domain.Entities;
+using backend.Domain.Common.Results;
 using backend.Domain.Repositories;
 
 namespace backend.Application.Services;
 
-public class DayService
+public class DayService(IDayRepository dayRepository) : IDayService
 {
-
-    private readonly IDayRepository _dayRepository;
-    
-    public DayService(IDayRepository dayRepository)
+    public async Task<Result<DayDto>> CreateForTripAsync(Guid tripId, CreateDayDto dto)
     {
-        _dayRepository = dayRepository;
-    }
-
-    public async Task<DayDto> CreateForTrip(string tripId, CreateDayDto dto)
-    {
-        var day =  dto.ToEntity();
-        var result = await _dayRepository.CreateForTrip(tripId, day);
-        
-        return result switch
+        var day = dto.ToEntity();
+        var result = await dayRepository.CreateForTripAsync(tripId, day);
+        if (result.IsFailure)
         {
-            DayRepositoryResult.TripNotFound => throw new NotFoundException(typeof(Trip),tripId),
-            DayRepositoryResult.Success => day.ToDto(),
-            _ => throw new BadRequestException(null)
-        };
+            return Result<DayDto>.Failure(
+                result.Error ?? "",
+                result.ErrorType ?? ErrorType.Generic);
+        }
+
+        return Result<DayDto>.Success(day.ToDto());
     }
 
-    public async Task DeleteForTrip(string tripId, string id)
+    public async Task<Result<DayDto>> UpdateAsync(Guid dayId, UpdateDayDto dto)
     {
-        var result = await _dayRepository.DeleteForTrip(tripId, id);
-        
-        if (result ==  DayRepositoryResult.TripNotFound)
-            throw new NotFoundException(typeof(Trip), id);
-        if(result == DayRepositoryResult.DayNotFound)
-            throw new NotFoundException(typeof(Trip), id);
-    }
-
-    public async Task<DayDto> UpdateForTrip(string tripId, string id, UpdateDayDto dto)
-    {
-        var day = dto.ToEntity(id);
-        var result = await _dayRepository.UpdateForTrip(tripId, day);
-        
-        return result switch
+        var day = dto.ToEntity(dayId);
+        var result = await dayRepository.UpdateAsync(day);
+        if (result.IsFailure)
         {
-            DayRepositoryResult.DayNotFound => throw new NotFoundException(typeof(Day),id),
-            DayRepositoryResult.TripNotFound => throw new NotFoundException(typeof(Trip),id),
-            DayRepositoryResult.Success => day.ToDto(),
-            _ => throw new BadRequestException(null)
-        };
+            return Result<DayDto>.Failure(
+                result.Error ?? "",
+                result.ErrorType ?? ErrorType.Generic);
+        }
+        return Result<DayDto>.Success(day.ToDto());
+    }
+
+    public async Task<Result> DeleteAsync(Guid dayId)
+    {
+        var result = await dayRepository.DeleteAsync(dayId);
+        return result;
+    }
+
+    public async Task<Result> AppendDestinationAsync(Guid dayId, Guid destinationId)
+    {
+        var result = await dayRepository.AppendDestinationAsync(dayId, destinationId);
+        return result;
     }
 }

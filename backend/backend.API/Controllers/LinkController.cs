@@ -1,50 +1,30 @@
+using backend.API.Extensions;
 using backend.Application.DTOs;
 using backend.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.API.Controllers;
 
-public class LinkController : ControllerBase
+public class LinkController(ILinkService linkService) : ControllerBase
 {
-    private readonly LinkService _service;
-
-    public LinkController(LinkService service)
-    {
-        _service = service;
-    }
-
-    [HttpPost("/trip/{tripId}/link")]
-    public async Task<ActionResult<LinkDto>> CreateForTrip(string tripId, [FromBody] CreateLinkDto dto)
+    [HttpPost("/trips/{tripId}/links")]
+    public async Task<ActionResult<LinkDto>> CreateLinkForTrip(Guid tripId, [FromBody] CreateLinkDto dto)
     { 
-        var result = await _service.CreateForTrip(tripId, dto);
+        var result = await linkService.CreateForTripAsync(tripId, dto);
+        return result.ToActionResult();
+    }
+
+    [HttpDelete("links/{linkId}")]
+    public async Task<IActionResult> DeleteLink(Guid linkId) 
+    {
+        var result = await linkService.DeleteAsync(linkId);
+        return result.ToActionResult();
+    }
+
+    [HttpPatch("links/{linkId}")]
+    public async Task<IActionResult> UpdateLink(Guid linkId, [FromBody] UpdateLinkDto dto)
+    {
+        var result = await linkService.UpdateAsync(linkId, dto);
         return Ok(result);
-    }
-
-    [HttpDelete("/trip/{tripId}/link/{id}")]
-    public async Task<IActionResult> DeleteForTrip(string tripId,string id)
-    {
-        await _service.DeleteForTrip(tripId, id);
-        return NoContent();
-    }
-
-    [HttpPatch("/trip/{tripId}/link/{id}")]
-    public async Task<IActionResult> UpdateForTrip(string tripId, string id, [FromBody] UpdateLinkDto dto)
-    {
-        var result = await _service.UpdateForTrip(tripId, id, dto);
-        return Ok(result);
-    }
-
-    [HttpPatch("/trip/{tripId}/destination/{destinationId}/append/link/{id}")]
-    public async Task<IActionResult> AppendLinkToDestination(string tripId, string destinationId, string id)
-    {
-        await _service.AppendLinkToDestination(tripId, destinationId, id);
-        return Ok();
-    }
-
-    [HttpPatch("/trip/{tripId}/destination/{destinationId}/remove/link/{id}")]
-    public async Task<IActionResult> RemoveLinkToDestination(string tripId, string destinationId, string id)
-    {
-        await _service.RemoveLinkFromDestination(tripId, destinationId, id);
-        return Ok();
     }
 }

@@ -1,3 +1,4 @@
+using backend.API.Extensions;
 using backend.Application.DTOs;
 using backend.Application.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -6,26 +7,33 @@ namespace backend.API.Controllers;
 
 [ApiController]
 [Route("api/v1")]
-public class DayController : ControllerBase
+public class DayController(IDayService dayService): ControllerBase
 {
-    private readonly DayService _dayService;
-
-    public DayController(DayService dayService)
+    [HttpPost("trips/{tripId}/days")]
+    public async Task<ActionResult<DayDto>> Create([FromRoute] Guid tripId, [FromBody] CreateDayDto dto)
     {
-        _dayService = dayService;
+        var result = await dayService.CreateForTripAsync(tripId, dto);
+        return result.ToActionResult();
     }
 
-    [HttpPost("trip/{tripId}/day")]
-    public async Task<ActionResult<DayDto>> Create([FromRoute] string tripId, [FromBody] CreateDayDto dto)
+    [HttpPatch("days/{dayId}")]
+    public async Task<ActionResult<DayDto>> Update([FromRoute] Guid dayId, [FromBody] UpdateDayDto dto)
     {
-        var result = await _dayService.CreateForTrip(tripId, dto);
-        return Ok(result);
+        var result = await dayService.UpdateAsync(dayId, dto);
+        return result.ToActionResult();
+    }
+    
+    [HttpDelete("days/{dayId}")]
+    public async Task<IActionResult> Delete([FromRoute] Guid dayId)
+    {
+        var result = await dayService.DeleteAsync(dayId);
+        return result.ToActionResult();
     }
 
-    [HttpPatch("trip/{tripId}/day/{dayId}")]
-    public async Task<ActionResult<DayDto>> Update([FromRoute] string tripId, [FromRoute] string dayId, [FromBody] UpdateDayDto dto)
+    [HttpPut("days/{dayId}/appendDestination/{destinationId}")]
+    public async Task<IActionResult> AppendDestination([FromRoute] Guid dayId, [FromRoute] Guid destinationId)
     {
-        var result = await  _dayService.UpdateForTrip(tripId, dayId, dto);
-        return Ok(result);
+        var result = await dayService.AppendDestinationAsync(dayId, destinationId);
+        return result.ToActionResult();
     }
 }

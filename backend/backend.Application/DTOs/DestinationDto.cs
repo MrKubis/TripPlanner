@@ -1,20 +1,18 @@
 namespace backend.Application.DTOs;
 
-public class DestinationDto
+public record DestinationDto : BaseEntityDto
 {
-    public string Id { get; set; }
     public string Name { get; set; }
     public LocationDto Location { get; set; }
-    public List<string> LinkIds { get; set; }
 }
 
-public class CreateDestinationDto
+public record CreateDestinationDto
 {
     public string Name { get; set; }
     public CreateLocationDto Location { get; set; }
 }
 
-public class UpdateDestinationDto
+public record UpdateDestinationDto
 {
     public string? Name { get; set; }
     public UpdateLocationDto? Location { get; set; }

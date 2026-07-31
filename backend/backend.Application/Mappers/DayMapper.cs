@@ -10,17 +10,15 @@ public static class DayMapper
       return new Day
       {
          Date = dto.Date,
-         DestinationIds = []
       };
    }
 
-   public static Day ToEntity(this UpdateDayDto dto, string dayId)
+   public static Day ToEntity(this UpdateDayDto dto, Guid dayId)
    {
       return new Day
       {
          Id = dayId,
          Date = dto.Date,
-         DestinationIds = dto.DestinationIds
       };
    }
    public static DayDto ToDto(this Day day)
@@ -29,7 +27,6 @@ public static class DayMapper
       {
          Id = day.Id,
          Date = day.Date,
-         DestinationIds = day.DestinationIds
       };
    }
 }

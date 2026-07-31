@@ -1,3 +1,4 @@
+using backend.API.Extensions;
 using backend.Application.DTOs;
 using backend.Application.Services;
 using backend.Domain.Specifications;
@@ -6,48 +7,42 @@ using Microsoft.AspNetCore.Mvc;
 namespace backend.API.Controllers;
 
 [ApiController]
-[Route("api/v1/trip")]
-public class TripController : ControllerBase
+[Route("api/v1/trips")]
+public class TripController(ITripService tripService) : ControllerBase
 {
-    private readonly TripService _tripService;
-
-    public TripController(TripService tripService)
-    {
-        _tripService = tripService;
-    }
-
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TripDto>>> GetAllAsync([FromQuery] CatalogSpecParams catalogSpecParams)
+    public async Task<ActionResult<IEnumerable<TripDto>>> GetPaginationAsync(
+        [FromQuery] CatalogSpecParams catalogSpecParams)
     {
-        var result = await _tripService.GetAllAsync(catalogSpecParams);
+        var result = await tripService.GetPaginationAsync(catalogSpecParams);
         return Ok(result);
     }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<TripDto>> GetByIdAsync(string id)
+    [HttpGet("{tripId}")]
+    public async Task<ActionResult<TripDetailsDto>> GetByIdAsync(Guid tripId)
     {
-        var result = await _tripService.GetByIdAsync(id);
-        return Ok(result);
+        var result = await tripService.GetByIdAsync(tripId);
+        return result.ToActionResult();
     }
 
     [HttpPost]
-    public async Task<ActionResult<TripDto>> PostAsync([FromBody] CreateTripDto dto)
+    public async Task<ActionResult<TripDetailsDto>> PostAsync([FromBody] CreateTripDto dto)
     {
-        var result = await _tripService.Create(dto);
-        return Ok(result);
+        var result = await tripService.Create(dto);
+        return result.ToActionResult();
     }
 
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteAsync(string id)
+    [HttpDelete("{tripId}")]
+    public async Task<IActionResult> DeleteAsync(Guid tripId)
     {
-        await _tripService.Delete(id);
-        return NoContent();
+        var result = await tripService.Delete(tripId);
+        return result.ToActionResult();
     }
 
-    [HttpPatch("{id}")]
-    public async Task<ActionResult> UpdateAsync([FromRoute] string id, [FromBody] UpdateTripDto dto)
+    [HttpPatch("{tripId}")]
+    public async Task<IActionResult> UpdateAsync([FromRoute] Guid tripId, [FromBody] UpdateTripDto dto)
     {
-        await _tripService.Update(id,dto);
-        return NoContent();
+        var result = await tripService.Update(tripId,dto);
+        return result.ToActionResult();
     }
 }

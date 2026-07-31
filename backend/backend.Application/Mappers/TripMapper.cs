@@ -24,7 +24,7 @@ public static class TripMapper
             Id = trip.Id,
             Title = trip.Title,
             CreatedBy = trip.CreatedBy,
-            CreatedOn = trip.CreatedOn,
+            CreatedDate = trip.CreatedDate,
         };
     }
 
@@ -35,7 +35,9 @@ public static class TripMapper
             Id = trip.Id,
             Title = trip.Title,
             CreatedBy = trip.CreatedBy,
-            CreatedOn = trip.CreatedOn,
+            CreatedDate = trip.CreatedDate,
+            ModifiedBy = trip.ModifiedBy,
+            ModifiedDate = trip.ModifiedDate,
             Description = trip.Description,
             Destinations = trip.Destinations
                 .Select(d => d.ToDto())
@@ -62,8 +64,7 @@ public static class TripMapper
             Days = new List<Day>(),
             Destinations = new List<Destination>(),
             Expenses = new List<Expense>(),
-            CreatedOn = DateTime.UtcNow,
-            CreatedBy = null
+            CreatedDate = DateTime.UtcNow,
         };
     }
 }

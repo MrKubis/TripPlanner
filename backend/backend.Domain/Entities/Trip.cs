@@ -1,36 +1,13 @@
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-
 namespace backend.Domain.Entities;
 
-public class Trip
+public class Trip : BaseEntity
 {
-    [BsonId]
-    [BsonElement("_id"),BsonRepresentation(BsonType.ObjectId)]
-    public string? Id {get; set;}
-    
-    [BsonElement("title")] 
-    public string? Title;
-    
-    [BsonElement("created_by"),BsonRepresentation(BsonType.ObjectId)]
-    public string? CreatedBy {get; set;}
-    
-    [BsonElement("description")]
+    public string Title {get; set;}
     public string Description {get; set;}
     
-    [BsonElement("created_on")]
-    public DateTime CreatedOn {get; set;}
+    public virtual ICollection<Destination> Destinations { get; set; }
+    public virtual ICollection<Link> Links { get; set; }
+    public virtual ICollection<Day> Days { get; set; }
+    public virtual ICollection<Expense> Expenses { get; set; }
     
-    [BsonElement("destinations")]
-    public List<Destination> Destinations {get; set;}
-    
-    [BsonElement("links")]
-    public List<Link> Links {get; set;}
-    
-    [BsonElement("days")]
-    public List<Day> Days {get; set;}
-    
-    [BsonElement("expenses")]
-    public List<Expense> Expenses {get; set;}
-
 }

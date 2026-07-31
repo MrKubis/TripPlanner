@@ -1,15 +1,10 @@
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-
 namespace backend.Domain.Entities;
 
-public class Day
+public class Day : BaseEntity
 {
-    [BsonId]
-    [BsonElement("_id"),BsonRepresentation(BsonType.ObjectId)]
-    public string? Id {get; set;} = ObjectId.GenerateNewId().ToString();
-    [BsonElement("date")]
     public DateOnly Date {get; set;}
-    [BsonElement("destinationIds")]
-    public List<string> DestinationIds { get; set; } = new List<string>();
+    public Guid TripId {get; set;}
+    public Trip Trip {get; set;}
+    
+    public virtual List<Destination> Destinations { get; set; }
 }

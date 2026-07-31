@@ -1,19 +1,13 @@
 namespace backend.Application.DTOs;
 
-public class TripDto
+public record TripDto : BaseEntityDto
 {
-    public string Id { get; set; }
     public string Title { get; set; }
-    public string CreatedBy { get; set; }
-    public DateTime CreatedOn { get; set; }
 }
 
-public class TripDetailsDto
+public record TripDetailsDto : BaseEntityDto
 {
-    public string Id { get; set; }
     public string Title { get; set; }
-    public string CreatedBy { get; set; }
-    public DateTime CreatedOn { get; set; }
     public string Description { get; set; }
     public List<DestinationDto> Destinations { get; set; }
     public List<LinkDto> Links { get; set; }
@@ -21,13 +15,13 @@ public class TripDetailsDto
     public List<ExpenseDto> Expenses { get; set; }
 }
 
-public class CreateTripDto
+public record CreateTripDto
 {
     public required string Title { get; set; }
     public string Description { get; set; }
 }
 
-public class UpdateTripDto
+public record UpdateTripDto
 {
     public required string Title { get; set; }
     public string Description { get; set; }
