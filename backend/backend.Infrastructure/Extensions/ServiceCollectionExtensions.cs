@@ -14,9 +14,13 @@ public static class ServiceCollectionExtensions
    {
       var connectionString = configuration.GetConnectionString("DefaultConnection");
       services.AddDbContext<AppDbContext>(options =>
-         options.UseNpgsql(connectionString, b => 
-            b.MigrationsAssembly("backend.Infrastructure"))
-         );
+      {
+         options.UseNpgsql(connectionString, b =>
+            b.MigrationsAssembly("backend.Infrastructure"));
+
+         options.UseSnakeCaseNamingConvention();
+
+      });
       
       services.AddScoped<ILinkRepository, LinkRepository>();
       services.AddScoped<ITripRepository, TripRepository>();
