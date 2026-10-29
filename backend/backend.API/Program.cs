@@ -1,20 +1,18 @@
 using backend.API.Exceptions.Handlers;
 using backend.Application.Extensions;
 using backend.Infrastructure.Extensions;
+using backend.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 builder.Services.AddControllers();
 
+builder.Services.AddOpenApi();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -34,20 +32,30 @@ builder.Services.AddCors(options => {
             .AllowAnyMethod();
     });
 });
-var app = builder.Build();
-app.UseCors("Dev");
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    logger.LogInformation("Beginning database migration.");
+    await db.Database.MigrateAsync();
+}    
 
 app.UseExceptionHandler();
+app.UseHttpsRedirection();
+app.UseCors("Dev");
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference(options =>
+    {
+        options.WithTitle("Backend API")
+            .WithTheme(ScalarTheme.Default); // Opcjonalnie: zmiana motywu graficznego
+    });
+}
 
 app.MapControllers();
-
-app.UseHttpsRedirection();
-
 app.Run();
