@@ -7,9 +7,9 @@ public static class ServiceCollectionExtensions
 {
     public static void AddApplication(this IServiceCollection services)
     {
-        services.AddScoped<DayService>();
-        services.AddScoped<TripService>();
-        services.AddScoped<DestinationService>();
-        services.AddScoped<LinkService>();
+        services.AddScoped<IDayService , DayService>();
+        services.AddScoped<ITripService, TripService>();
+        services.AddScoped<IDestinationService, DestinationService>();
+        services.AddScoped<ILinkService, LinkService>();
     }
 }
