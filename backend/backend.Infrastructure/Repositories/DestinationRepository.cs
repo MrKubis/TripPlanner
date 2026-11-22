@@ -55,6 +55,8 @@ public class DestinationRepository (AppDbContext context): IDestinationRepositor
         
         destination.TripId = day.TripId;
         destination.DayId = dayId;
+        
+        context.Destinations.Add(destination);
         await context.SaveChangesAsync();
         return Result.Success();
     }

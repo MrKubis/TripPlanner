@@ -11,7 +11,7 @@ public static class ExpenseMapper
       {
          Name = expense.Name,
          Description = expense.Description,
-         Price = expense.Price.ToString()
+         Price = expense.Price
       };
    } 
 }

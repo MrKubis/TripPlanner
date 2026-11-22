@@ -39,7 +39,7 @@ public class TripController(ITripService tripService) : ControllerBase
         return result.ToActionResult();
     }
 
-    [HttpPatch("{tripId}")]
+    [HttpPut("{tripId}")]
     public async Task<IActionResult> UpdateAsync([FromRoute] Guid tripId, [FromBody] UpdateTripDto dto)
     {
         var result = await tripService.Update(tripId,dto);

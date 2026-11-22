@@ -8,15 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\backend.Domain\backend.Domain.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Microsoft.AspNetCore.Diagnostics">
-        <HintPath>..\..\..\..\..\.nuget\packages\microsoft.aspnetcore.app.ref\8.0.25\ref\net8.0\Microsoft.AspNetCore.Diagnostics.dll</HintPath>
-      </Reference>
-      <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
-        <HintPath>..\..\..\..\..\.nuget\packages\microsoft.aspnetcore.app.ref\8.0.25\ref\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
-      </Reference>
+      <ProjectReference Include="..\backend.Infrastructure\backend.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>

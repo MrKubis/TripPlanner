@@ -26,10 +26,11 @@ builder.Services.AddProblemDetails(configure =>
 });
 
 builder.Services.AddCors(options => {
-    options.AddPolicy("Dev", policy => {
-        policy.WithOrigins("http://localhost:4200")
+    options.AddPolicy("DevAllowFrontend", policy => {
+        policy.WithOrigins("http://localhost:5173")
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -45,7 +46,7 @@ using (var scope = app.Services.CreateScope())
 
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
-app.UseCors("Dev");
+app.UseCors("DevAllowFrontend");
 
 if (app.Environment.IsDevelopment())
 {

@@ -1,6 +1,5 @@
 using backend.Domain.Common.Results;
 using backend.Domain.Entities;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace backend.Domain.Repositories;
 

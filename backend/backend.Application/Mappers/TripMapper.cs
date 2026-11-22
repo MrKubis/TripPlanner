@@ -23,6 +23,7 @@ public static class TripMapper
         {
             Id = trip.Id,
             Title = trip.Title,
+            Description = trip.Description,
             CreatedBy = trip.CreatedBy,
             CreatedDate = trip.CreatedDate,
         };

@@ -27,6 +27,7 @@ public static class DayMapper
       {
          Id = day.Id,
          Date = day.Date,
+         DestinationIds = day.Destinations?.Select(d => d.Id).ToList() ?? [],
       };
    }
 }

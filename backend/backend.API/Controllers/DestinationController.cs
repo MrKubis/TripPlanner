@@ -16,7 +16,7 @@ public class DestinationController(IDestinationService destinationService) : Con
         return result.ToActionResult();
     }
 
-    [HttpPost("days/{dayId}/destinations/{destinationId}")]
+    [HttpPost("days/{dayId}")]
     public async Task<ActionResult<DestinationDto>> CreateDestinationForDay(Guid dayId, [FromBody] CreateDestinationDto dto)
     {
         var result = await destinationService.CreateForDayAsync(dayId, dto);

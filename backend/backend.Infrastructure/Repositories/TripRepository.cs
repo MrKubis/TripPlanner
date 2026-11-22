@@ -23,7 +23,8 @@ public class TripRepository(AppDbContext context) : ITripRepository
 
     public async Task<Trip> CreateAsync(Trip trip)
     {    
-        await context.Trips.AddAsync(trip);
+        context.Trips.Add(trip);
+        await context.SaveChangesAsync();
         return trip;
     }
 
